@@ -11,16 +11,16 @@ func (this *Topic) init() {
 	this.broadcast = make(chan string)
 }
 
-func (this *Topic) notifyAll(subscriberList map[string]*Subscriber, flag *bool) {
+func (this *Topic) notifyAll(subscriberList map[string]*Subscriber) bool {
 	select {
 		case s := <- this.broadcast:
-			for _, i := range subscriberList {
-				i.receiver <- s
+			for _, i := range this.subscriber {
+				subscriberList[i].receiver <- s
 			}
 		case <-quit:
-			*flag = true
-			return
+			return true
+		default:
+			return false
 	}
-	*flag = false
-	return
+	return false
 }

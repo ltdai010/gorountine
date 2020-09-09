@@ -27,16 +27,21 @@ func main() {
 	sub2.subscribe(top)
 	//create a publisher
 	listPublisher["Dia"] = &Publisher{name: "Dia"}
-	pub := listPublisher["Dia"]
+	pub1 := listPublisher["Dia"]
+	listPublisher["Dat"] = &Publisher{name: "Dat"}
+	pub2 := listPublisher["Dat"]
+	publishToATopic(pub1, top, listSubscriber, "pub 1 post")
+	publishToATopic(pub2, top, listSubscriber, "pub 2 post")
+}
+
+func publishToATopic(pub *Publisher, top *Topic, listSubscriber map[string]*Subscriber, content string) {
 	//publish a content
-	go pub.publish(top, "pub 1 publish this content")
+	go pub.publish(top, content)
 	//print notice of this subscriber
-	go printNotice(listSubscriber)
+	go printNotice(listSubscriber, top.subscriber)
 	//send to all subscriber
-	flag := false
 	for {
-		go top.notifyAll(listSubscriber, &flag)
-		if flag {
+		if top.notifyAll(listSubscriber) {
 			return
 		}
 	}
@@ -44,9 +49,9 @@ func main() {
 
 
 
-func printNotice(subscriberList map[string]*Subscriber)  {
-	for _, i := range subscriberList {
-		fmt.Println(<-i.receiver + " to " + i.name)
+func printNotice(subscriberList map[string]*Subscriber, subscriberName []string)  {
+	for _, i := range subscriberName {
+		fmt.Println(<-subscriberList[i].receiver + " to " + i)
 	}
 	quit <- 0
 }
