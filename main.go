@@ -34,8 +34,8 @@ func main() {
 	//print notice of this subscriber
 	go printNotice(listSubscriber)
 	//send to all subscriber
-	notifyAll(top, listSubscriber)
-	time.Sleep(500*time.Millisecond)
+	go notifyAll(top, listSubscriber)
+	time.Sleep(1*time.Second)
 }
 
 
