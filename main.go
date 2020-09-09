@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"time"
 )
 
 var (
@@ -34,22 +33,15 @@ func main() {
 	//print notice of this subscriber
 	go printNotice(listSubscriber)
 	//send to all subscriber
-	go notifyAll(top, listSubscriber)
-	time.Sleep(1*time.Second)
-}
-
-
-func notifyAll(topic *Topic, subscriberList map[string]*Subscriber)  {
-	select {
-		case s := <- topic.broadcast:
-			for _, i := range subscriberList {
-				i.receiver <- s
-			}
-		case <-quit:
+	flag := false
+	for {
+		go top.notifyAll(listSubscriber, &flag)
+		if flag {
 			return
+		}
 	}
-	return
 }
+
 
 
 func printNotice(subscriberList map[string]*Subscriber)  {
