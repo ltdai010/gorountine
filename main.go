@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 )
 
 var (
@@ -28,29 +29,26 @@ func main() {
 	//create a publisher
 	listPublisher["Dia"] = &Publisher{name: "Dia"}
 	pub := listPublisher["Dia"]
-	//print notice of this subscriber
-	go printNotice(listSubscriber)
 	//publish a content
 	go pub.publish(top, "pub 1 publish this content")
+	//print notice of this subscriber
+	go printNotice(listSubscriber)
 	//send to all subscriber
-	for {
-		if notifyAll(top, listSubscriber) {
-			break
-		}
-	}
+	notifyAll(top, listSubscriber)
+	time.Sleep(500*time.Millisecond)
 }
 
 
-func notifyAll(topic *Topic, subscriberList map[string]*Subscriber) bool {
+func notifyAll(topic *Topic, subscriberList map[string]*Subscriber)  {
 	select {
 		case s := <- topic.broadcast:
 			for _, i := range subscriberList {
 				i.receiver <- s
 			}
 		case <-quit:
-			return true
+			return
 	}
-	return false
+	return
 }
 
 
